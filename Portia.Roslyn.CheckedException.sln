@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portia.Roslyn.CheckedException", "Portia.Roslyn.CheckedException\Portia.Roslyn.CheckedException\Portia.Roslyn.CheckedException.csproj", "{DC358A2A-E625-427F-8456-750C296BA430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portia.Roslyn.CheckedException.Test", "Portia.Roslyn.CheckedException\Portia.Roslyn.CheckedException.Test\Portia.Roslyn.CheckedException.Test.csproj", "{B67AB173-867D-4440-802D-07B645E3AE23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portia.Roslyn.CheckedException.Vsix", "Portia.Roslyn.CheckedException\Portia.Roslyn.CheckedException.Vsix\Portia.Roslyn.CheckedException.Vsix.csproj", "{BBCF4249-E585-442F-B307-44EBDC45C0FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portia.Roslyn.Base", "Portia.Roslyn.Base\Portia.Roslyn.Base.csproj", "{8DE27DD3-4A1B-4D32-BC63-F0BFC6E93F79}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC358A2A-E625-427F-8456-750C296BA430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC358A2A-E625-427F-8456-750C296BA430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC358A2A-E625-427F-8456-750C296BA430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC358A2A-E625-427F-8456-750C296BA430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67AB173-867D-4440-802D-07B645E3AE23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67AB173-867D-4440-802D-07B645E3AE23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67AB173-867D-4440-802D-07B645E3AE23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67AB173-867D-4440-802D-07B645E3AE23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBCF4249-E585-442F-B307-44EBDC45C0FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBCF4249-E585-442F-B307-44EBDC45C0FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBCF4249-E585-442F-B307-44EBDC45C0FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBCF4249-E585-442F-B307-44EBDC45C0FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE27DD3-4A1B-4D32-BC63-F0BFC6E93F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE27DD3-4A1B-4D32-BC63-F0BFC6E93F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE27DD3-4A1B-4D32-BC63-F0BFC6E93F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE27DD3-4A1B-4D32-BC63-F0BFC6E93F79}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
