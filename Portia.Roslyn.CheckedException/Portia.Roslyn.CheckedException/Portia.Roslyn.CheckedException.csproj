@@ -67,12 +67,6 @@
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Portia.Roslyn.Base\Portia.Roslyn.Base.csproj">
-      <Project>{8de27dd3-4a1b-4d32-bc63-f0bfc6e93f79}</Project>
-      <Name>Portia.Roslyn.Base</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CodeAnalysis.Common.1.0.1\lib\portable-net45+win8\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
@@ -117,6 +111,12 @@
       <HintPath>..\..\packages\System.Reflection.Metadata.1.0.21\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Portia.Roslyn.Base\Portia.Roslyn.Base.csproj">
+      <Project>{8de27dd3-4a1b-4d32-bc63-f0bfc6e93f79}</Project>
+      <Name>Portia.Roslyn.Base</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Target Name="AfterBuild">
