@@ -4,11 +4,11 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using CheckedException.Base;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Portia.Roslyn.Base;
 
 namespace Portia.Roslyn.CheckedException
 {
@@ -30,10 +30,17 @@ namespace Portia.Roslyn.CheckedException
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
+            try
+            {
+                context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
-        private async static void SyntaxNodeAnalyze(SyntaxNodeAnalysisContext context)
+        private static void SyntaxNodeAnalyze(SyntaxNodeAnalysisContext context)
         {
             try
             {
@@ -42,18 +49,18 @@ namespace Portia.Roslyn.CheckedException
                 diagnosticReported = false;
                 foreach (var attrib in attribs)
                 {
-                     await CheckExceptionHandling(attrib, context);
+                    CheckExceptionHandling(attrib, context);
                     if (diagnosticReported)
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Debugger.Break();
+                Debug.WriteLine(ex.Message);
             }
         }
 
-        private async static Task CheckExceptionHandling(AttributeData throwExceptionAttrib, SyntaxNodeAnalysisContext context)
+        private static void CheckExceptionHandling(AttributeData throwExceptionAttrib, SyntaxNodeAnalysisContext context)
         {
             var attributeArgument = "";
 
@@ -70,22 +77,22 @@ namespace Portia.Roslyn.CheckedException
                 return;
 
             var attribs = from attrib in ((MethodDeclarationSyntax)parent).DescendantNodes().OfType<AttributeSyntax>()
-                      from throwsIdentifier in attrib.DescendantNodes().OfType<IdentifierNameSyntax>()
-                      from attribArgument in attrib.DescendantNodes().OfType<AttributeArgumentSyntax>()
-                      from identifier in attribArgument.DescendantNodes().OfType<IdentifierNameSyntax>()
-                      let throwsType = context.SemanticModel.GetTypeInfo(throwsIdentifier)
-                      let identifierType = context.SemanticModel.GetTypeInfo(identifier)
-                      where throwsType.Type != null && throwsType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName) &&
-                            identifierType.Type != null && identifierType.Type.ToString().Equals(attributeArgument)
-                      select attrib;
+                          from throwsIdentifier in attrib.DescendantNodes().OfType<IdentifierNameSyntax>()
+                          from attribArgument in attrib.DescendantNodes().OfType<AttributeArgumentSyntax>()
+                          from identifier in attribArgument.DescendantNodes().OfType<IdentifierNameSyntax>()
+                          let throwsType = context.SemanticModel.GetTypeInfo(throwsIdentifier)
+                          let identifierType = context.SemanticModel.GetTypeInfo(identifier)
+                          where throwsType.Type != null && throwsType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName) &&
+                                identifierType.Type != null && identifierType.Type.ToString().Equals(attributeArgument)
+                          select attrib;
 
             if (attribs.Any())
                 return;
 
             // Checking try catch block
-            foreach(var g in context.Node.Parent.AncestorsAndSelf().OfType<TryStatementSyntax>())
+            foreach (var g in context.Node.Parent.AncestorsAndSelf().OfType<TryStatementSyntax>())
             {
-                foreach(var f in g.Catches)
+                foreach (var f in g.Catches)
                 {
                     if (f.Declaration == null)
                         return;

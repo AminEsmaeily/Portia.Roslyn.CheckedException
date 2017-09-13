@@ -1,23 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Portia.Roslyn.CheckedException.Microsoft.a012da06-ec8d-47e0-bf99-ee9234e45840" Version="1.0" Language="en-US" Publisher="Seyed Amin Esmaeily"/>
+    <Identity Id="Portia.Roslyn.CheckedException.Microsoft.538233c7-a51c-4537-9165-ad40770b3373" Version="1.0" Language="en-US" Publisher="Seyed Amin Esmaeily"/>
     <DisplayName>Portia.Roslyn.CheckedException</DisplayName>
     <Description xml:space="preserve">This is an extention to enable developers to be able to add CheckedException feature to there projects.</Description>
+    <MoreInfo>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException</MoreInfo>
     <License>LICENSE.txt</License>
+    <GettingStartedGuide>README.txt</GettingStartedGuide>
     <Icon>icon.png</Icon>
     <PreviewImage>preview.jpg</PreviewImage>
     <Tags>exception handling, try-catch, rethrow, checked exception, c#, csharp</Tags>
   </Metadata>
-  <Installation>
-    <InstallationTarget Version="[14.0,)" Id="Microsoft.VisualStudio.Pro" />
+  <Installation AllUsers="true">
+    <InstallationTarget Version="[14.0,]" Id="Microsoft.VisualStudio.Pro" />
   </Installation>
   <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5)" />
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,]" />
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Portia.Roslyn.CheckedException" Path="|Portia.Roslyn.CheckedException|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Portia.Roslyn.CheckedException" Path="|Portia.Roslyn.CheckedException|"/>
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Portia.Roslyn.Base" Path="|Portia.Roslyn.Base|" AssemblyName="|Portia.Roslyn.Base;AssemblyName|" />
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />

@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Portia.Roslyn.CheckedException")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Keyhan Iranian")]
+[assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Portia.Roslyn.CheckedException")]
-[assembly: AssemblyCopyright("Copyright © Keyhan Iranian 2017")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

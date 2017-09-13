@@ -10,7 +10,7 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In __CheckedException__ project of the __Portia__ project we created a Visual Studio extention(.VSIX) that can add ability of JAVA's Checked Exception to C#. It makes Programmers and Solution Designers to be able to design layers and methods with less risk of unhandled exceptions. They can handle exceptions in any layer they want and have a good _Stack Trace_ of the throwed exceptions.
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To use this extention you should add reference to Portia.Roslyn.Base library and after that, add **CheckedException.Base.ThrowsExceptionAttribute** annotation to top of method like this:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To use this extention you should add attribute of type **CheckedException.Base.ThrowsExceptionAttribute** to top of method like this:
 <br/>
 ```csharp
 [CheckedException.Base.ThrowsException(typeof(InvalidCastException))]
@@ -24,7 +24,7 @@ public static double DivideNumbers(int a, int b)
     return a / b;
 }
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CheckedException.Base.ThrowsExceptionAttribute__ has one constructor parameter that accepts a type. You can give it any type you want, but it won't work for you if the type you gave is not a sub class of __System.Exeption__; So it's better to give it a type that is inherited from __System.Exception__ ;). If developer/designer wants to rethrow the exception throwed from submethod, he/she can add same attribute on top of his/her method; or if he/she wants to handle exception on throwed, he/she can use a try-catch block.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CheckedExcception.Base.ThrowsExceptionAttribute__ has one constructor parameter that accepts a type. You can give it any type you want, but it won't work for you if the type you gave is not a sub class of __System.Exeption__; So it's better to give it a type that is inherited from __System.Exception__ ;). If developer/designer wants to rethrow the exception throwed from submethod, he/she can add same attribute on top of his/her method; or if he/she wants to handle exception on throwed, he/she can use a try-catch block.
 <br/>
 <br/>
 ### How does it work
@@ -35,4 +35,4 @@ public static double DivideNumbers(int a, int b)
 If non of desired ways has been found in caller, I report a __Diagnostic__ to inform the programmer of the exception.</br>
 
 #### Code Fixer
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To refactor the code and making changes in code to solve the problem, I fetch all of the attributes again just like the analyzer. If an exception is not handled in code, I look after the try-catch block around method invocation. If I find a try-catch block, then I add a new **Catch** block to the try, else, I add a complete try-catch block around the invocation.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To refactoring the code and making changes in code to solve the problem, I fetch all of the attributes again just like the analyzer. If an exception is not handled in code, I look after the try-catch block around method invocation. If I find a try-catch block, then I add a new **Catch** block to the try, else, I add a complete try-catch block around the invocation.

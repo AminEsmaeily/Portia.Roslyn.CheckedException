@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
@@ -6,11 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis.CSharp;
-using CheckedException.Base;
-using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Portia.Roslyn.Base;
 
 namespace Portia.Roslyn.CheckedException
 {
@@ -115,7 +115,7 @@ namespace Portia.Roslyn.CheckedException
                 }
 
                 //if (tryElement == null || !tryElement.Catches.Any(f => f.Declaration.Type is IdentifierNameSyntax && ((IdentifierNameSyntax)f.Declaration.Type).Identifier.Text.Equals(typeName)))
-                if(createCatchPart)
+                if (createCatchPart)
                 {
                     IdentifierNameSyntax catchTypeSyntax = SyntaxFactory.IdentifierName(typeName);
                     var catchDeclaration = SyntaxFactory.CatchDeclaration(catchTypeSyntax, new SyntaxToken());
@@ -135,14 +135,14 @@ namespace Portia.Roslyn.CheckedException
                 var prevSyntax = (SyntaxNode)body.Parent.ChildNodesAndTokens().ToList()[expressionIndex - 1];
                 BlockSyntax block = SyntaxFactory.Block(body);
 
-                
+
                 TryStatementSyntax trySyntax = SyntaxFactory.TryStatement(block, new SyntaxList<CatchClauseSyntax>(), null);
                 trySyntax = trySyntax.AddCatches(catches.ToArray());
-                
+
                 newRoot = oldRoot.ReplaceNode(body, trySyntax);
             }
 
             return document.WithSyntaxRoot(newRoot);
-        }        
+        }
     }
 }

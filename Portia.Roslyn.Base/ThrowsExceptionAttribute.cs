@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CheckedException.Base
+namespace Portia.Roslyn.Base
 {
     [AttributeUsage(validOn: AttributeTargets.Method, AllowMultiple = true)]
     public class ThrowsExceptionAttribute : Attribute
