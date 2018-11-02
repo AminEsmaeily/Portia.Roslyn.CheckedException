@@ -5,7 +5,7 @@ Checked Exception in C# Using Roslyn
 
     [Checked Exception](https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions "Checked Exception") is an ability of JAVA language which enables solution designers and programmers to manage exceptions in any part/layer of the project. For example, if it is required to handle a custom exception thrown by an **External Library** in the backend of the project and perform an appropriate task for it, the programmer(designer) of the method should introduce that custom exception in the method declaration. After that, Users of this method can handle the throwable exception declared in method anywhere they want.
 
-!(Alt Text)[https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/2-2.0.gif]
+![Alt Text](https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/2-2.0.gif)
 
     The most important benefit of **Checked Exception** is handling most unanticipated exceptions may be thrown by a method in another library. In this case, if the callee introduces all exceptions those should be handled by the caller, then the caller should handle these exceptions or rethrow them to its callers.  
 
