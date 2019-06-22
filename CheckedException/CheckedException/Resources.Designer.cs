@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Portia.Roslyn.CheckedException {
+namespace CheckedException {
     using System;
     using System.Reflection;
     
@@ -20,7 +20,7 @@ namespace Portia.Roslyn.CheckedException {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -40,7 +40,7 @@ namespace Portia.Roslyn.CheckedException {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Portia.Roslyn.CheckedException.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CheckedException.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,7 +62,7 @@ namespace Portia.Roslyn.CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All of exceptions identified by &apos;ThrowsExceptionAttribute&apos; should be handled..
+        ///   Looks up a localized string similar to The method &apos;{0}&apos; might have thrown exception of type {1}, and it is not handled in code..
         /// </summary>
         internal static string AnalyzerDescription {
             get {
@@ -71,7 +71,7 @@ namespace Portia.Roslyn.CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception of type &apos;{0}&apos; is not handled..
+        ///   Looks up a localized string similar to The exception of type {0} is not handled in code..
         /// </summary>
         internal static string AnalyzerMessageFormat {
             get {
@@ -80,7 +80,7 @@ namespace Portia.Roslyn.CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Checked exception is not handled..
+        ///   Looks up a localized string similar to The exception is not handled in code.
         /// </summary>
         internal static string AnalyzerTitle {
             get {

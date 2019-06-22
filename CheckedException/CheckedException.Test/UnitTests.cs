@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using TestHelper;
-using Portia.Roslyn.CheckedException;
+using CheckedException;
 
-namespace Portia.Roslyn.CheckedException.Test
+namespace CheckedException.Test
 {
     [TestClass]
     public class UnitTest : CodeFixVerifier
@@ -41,7 +41,7 @@ namespace Portia.Roslyn.CheckedException.Test
     }";
             var expected = new DiagnosticResult
             {
-                Id = "PortiaRoslynCheckedException",
+                Id = "CheckedException",
                 Message = String.Format("Type name '{0}' contains lowercase letters", "TypeName"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
@@ -71,12 +71,12 @@ namespace Portia.Roslyn.CheckedException.Test
 
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
-            return new PortiaRoslynCheckedExceptionCodeFixProvider();
+            return new CheckedExceptionCodeFixProvider();
         }
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new PortiaRoslynCheckedExceptionAnalyzer();
+            return new CheckedExceptionAnalyzer();
         }
     }
 }

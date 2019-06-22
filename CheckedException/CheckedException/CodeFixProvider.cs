@@ -1,27 +1,27 @@
-﻿using System;
+﻿using CheckedException.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Portia.Roslyn.Base;
 
-namespace Portia.Roslyn.CheckedException
+namespace CheckedException
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PortiaRoslynCheckedExceptionCodeFixProvider)), Shared]
-    public class PortiaRoslynCheckedExceptionCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CheckedExceptionCodeFixProvider)), Shared]
+    public class CheckedExceptionCodeFixProvider : CodeFixProvider
     {
-        private const string title = "Add missed exception handler";
+        private const string tryCatchTitle = "Add Try-Catch element";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(PortiaRoslynCheckedExceptionAnalyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(CheckedExceptionAnalyzer.DiagnosticId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()
@@ -37,9 +37,9 @@ namespace Portia.Roslyn.CheckedException
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: title,
+                    title: tryCatchTitle,
                     createChangedDocument: c => AddTryCatchAsync(context, c),
-                    equivalenceKey: title),
+                    equivalenceKey: "Equivalency**"),
                 context.Diagnostics.First());
         }
 
@@ -55,7 +55,7 @@ namespace Portia.Roslyn.CheckedException
             var methodAttribs = completeMethod.Parent.FirstAncestorOrSelf<MethodDeclarationSyntax>().AttributeLists;
 
             SemanticModel sm = await document.GetSemanticModelAsync();
-            var attribs = PortiaRoslynCheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
+            var attribs = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
 
             var tryElement = invocation.Parent.FirstAncestorOrSelf<TryStatementSyntax>();
 

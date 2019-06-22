@@ -7,11 +7,11 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <ProjectGuid>{98BC63C9-B48B-4992-A3DB-19A60AA6E464}</ProjectGuid>
+    <ProjectGuid>{B81C3C1B-ADD8-4D2E-91D1-42A9E2D210B2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Portia.Roslyn.CheckedException</RootNamespace>
-    <AssemblyName>Portia.Roslyn.CheckedException</AssemblyName>
+    <RootNamespace>CheckedException</RootNamespace>
+    <AssemblyName>CheckedException</AssemblyName>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -61,6 +61,7 @@
     <None Include="tools\uninstall.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
@@ -113,9 +114,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Portia.Roslyn.Base\Portia.Roslyn.Base.csproj">
-      <Project>{80653de9-fbd7-4c90-ae3f-3a7a2a8c9534}</Project>
-      <Name>Portia.Roslyn.Base</Name>
+    <ProjectReference Include="..\..\CheckedException.Core\CheckedException.Core.csproj">
+      <Project>{366ff570-d5f7-4fcb-afd2-a2733ba9b1a1}</Project>
+      <Name>CheckedException.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

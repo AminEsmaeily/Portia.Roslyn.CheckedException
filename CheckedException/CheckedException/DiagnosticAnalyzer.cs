@@ -1,43 +1,35 @@
+using CheckedException.Core;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Portia.Roslyn.Base;
 
-namespace Portia.Roslyn.CheckedException
+namespace CheckedException
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class PortiaRoslynCheckedExceptionAnalyzer : DiagnosticAnalyzer
+    public class CheckedExceptionAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "CheckedException";
-
+        
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "Exception Handling";
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
-
         private static bool diagnosticReported = false;
+
+        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
-            try
-            {
-                context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+            context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
         }
 
         private static void SyntaxNodeAnalyze(SyntaxNodeAnalysisContext context)
@@ -63,20 +55,43 @@ namespace Portia.Roslyn.CheckedException
         private static void CheckExceptionHandling(AttributeData throwExceptionAttrib, SyntaxNodeAnalysisContext context)
         {
             var attributeArgument = "";
-
-            // I used this way because of the exception described in https://github.com/dotnet/roslyn/issues/6226
+            
             foreach (var item in throwExceptionAttrib.ConstructorArguments)
             {
                 attributeArgument = item.Value.ToString();
                 break;
             }
 
-            SyntaxNode parent = context.Node.Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+            SyntaxNode callerMethod = context.Node.Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+            SyntaxNode callerClass = context.Node.Parent.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
 
-            if (parent == null)
+            if (callerMethod == null || callerClass == null)
                 return;
 
-            var attribs = from attrib in ((MethodDeclarationSyntax)parent).DescendantNodes().OfType<AttributeSyntax>()
+            var allAttributes = ((MethodDeclarationSyntax)callerMethod).DescendantNodes().OfType<AttributeSyntax>()
+                .Union(((ClassDeclarationSyntax)callerClass).DescendantNodes().OfType<AttributeSyntax>())
+                .ToList();
+
+            foreach(var attribute in allAttributes)
+            {
+                var attributeIdentifier = attribute.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                if (attributeIdentifier == null)
+                    continue;
+                var identifierType = context.SemanticModel.GetTypeInfo((IdentifierNameSyntax)attributeIdentifier);
+                if (identifierType.Type == null || !identifierType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName))
+                    continue;
+
+                var attributeArgs = attributeIdentifier.DescendantNodes().OfType<AttributeArgumentListSyntax>();
+                if (!attributeArgs.Any()) // It consist of all exception types
+                    return;
+
+                foreach(var argument in attributeArgs)
+                {
+                    var argumentIdentifier = argument
+                }
+            }
+
+            var callerMethodAttribs = from attrib in ((MethodDeclarationSyntax)callerMethod).DescendantNodes().OfType<AttributeSyntax>()
                           from throwsIdentifier in attrib.DescendantNodes().OfType<IdentifierNameSyntax>()
                           from attribArgument in attrib.DescendantNodes().OfType<AttributeArgumentSyntax>()
                           from identifier in attribArgument.DescendantNodes().OfType<IdentifierNameSyntax>()
@@ -86,7 +101,7 @@ namespace Portia.Roslyn.CheckedException
                                 identifierType.Type != null && identifierType.Type.ToString().Equals(attributeArgument)
                           select attrib;
 
-            if (attribs.Any())
+            if (callerMethodAttribs.Any())
                 return;
 
             // Checking try catch block
@@ -121,10 +136,8 @@ namespace Portia.Roslyn.CheckedException
             var info = semanticModel.GetSymbolInfo(method).Symbol;
             if (info == null)
                 return new List<AttributeData>();
-
-            var attribs = info.GetAttributes().Where(f => f.AttributeClass.MetadataName.Equals(typeof(ThrowsExceptionAttribute).Name));
-
-            return attribs.ToList();
+            
+            return info.GetAttributes().Where(f => f.AttributeClass.MetadataName.Equals(typeof(ThrowsExceptionAttribute).Name)).ToList();
         }
     }
 }
