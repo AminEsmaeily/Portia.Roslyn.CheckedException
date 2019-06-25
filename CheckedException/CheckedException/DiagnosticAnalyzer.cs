@@ -22,7 +22,7 @@ namespace CheckedException
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "Exception Handling";
 
-        private static bool diagnosticReported = false;
+        //private static bool diagnosticReported = false;
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
@@ -40,12 +40,12 @@ namespace CheckedException
                 var defaultSeverity = Core.DiagnosticSeverity.Error;
                 var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node, ref defaultSeverity);
 
-                diagnosticReported = false;
+                //diagnosticReported = false;
                 foreach (var attrib in attribs)
                 {
                     CheckExceptionHandling(attrib, context);
-                    if (diagnosticReported)
-                        break;
+                    /*if (diagnosticReported)
+                        break;*/
                 }
             }
             catch (Exception ex)
@@ -142,7 +142,7 @@ namespace CheckedException
             Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
             Diagnostic diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), attributeArgument);
             context.ReportDiagnostic(diagnostic);
-            diagnosticReported = true;
+            //diagnosticReported = true;
         }
 
         public static List<AttributeInfo> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method, ref Core.DiagnosticSeverity defaultSeverity)
