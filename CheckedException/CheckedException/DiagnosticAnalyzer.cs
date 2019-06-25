@@ -1,4 +1,5 @@
 using CheckedException.Core;
+using CheckedException.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,7 +37,8 @@ namespace CheckedException
         {
             try
             {
-                var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node);
+                var defaultSeverity = Core.DiagnosticSeverity.Error;
+                var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node, ref defaultSeverity);
 
                 diagnosticReported = false;
                 foreach (var attrib in attribs)
@@ -52,11 +54,11 @@ namespace CheckedException
             }
         }
 
-        private static void CheckExceptionHandling(AttributeData throwExceptionAttrib, SyntaxNodeAnalysisContext context)
+        private static void CheckExceptionHandling(AttributeInfo throwExceptionAttrib, SyntaxNodeAnalysisContext context)
         {
             var attributeArgument = "";
             
-            foreach (var item in throwExceptionAttrib.ConstructorArguments)
+            foreach (var item in throwExceptionAttrib.AttributeData.ConstructorArguments)
             {
                 attributeArgument = item.Value.ToString();
                 break;
@@ -137,18 +139,53 @@ namespace CheckedException
             }
             ////////////////////////////////////////////////////////
 
+            Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
             Diagnostic diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), attributeArgument);
             context.ReportDiagnostic(diagnostic);
             diagnosticReported = true;
         }
 
-        public static List<AttributeData> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method)
+        public static List<AttributeInfo> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method, ref Core.DiagnosticSeverity defaultSeverity)
         {
-            var info = semanticModel.GetSymbolInfo(method).Symbol;
+            var info = semanticModel.GetSymbolInfo(method).Symbol;            
             if (info == null)
-                return new List<AttributeData>();
-            
-            return info.GetAttributes().Where(f => f.AttributeClass.MetadataName.Equals(typeof(ThrowsExceptionAttribute).Name)).ToList();
+                return new List<AttributeInfo>();
+
+            var methodAttributes = info.GetAttributes().Where(f => f.AttributeClass.MetadataName.Equals(typeof(ThrowsExceptionAttribute).Name))
+                .Select(f => new
+                {
+                    Attribute = f,
+                    Order = 1
+                }).Union(info.ContainingSymbol.GetAttributes().Where(f => f.AttributeClass.MetadataName.Equals(typeof(ThrowsExceptionAttribute).Name))
+                .Select(f => new
+                {
+                    Attribute = f,
+                    Order = 2
+                }));
+
+            var result = new List<AttributeInfo>();
+            foreach(var attr in methodAttributes)
+            {
+                var exceptionType = attr.Attribute.ConstructorArguments.FirstOrDefault(f => f.Type.TypeKind == TypeKind.Class);
+
+                if (exceptionType.Type == null || 
+                    result.Any(f => f.AttributeData.ConstructorArguments.FirstOrDefault(g => g.Type.TypeKind == TypeKind.Class).Value == exceptionType.Value))
+                    continue;
+
+                var severities = methodAttributes.Where(f => f.Attribute.ConstructorArguments.Any(g => g.Type.TypeKind == TypeKind.Class && g.Value == exceptionType.Value) &&
+                                                             f.Attribute.ConstructorArguments.Any(x => x.Type.TypeKind == TypeKind.Enum))
+                                                 .OrderBy(f => f.Order);
+                Core.DiagnosticSeverity severity = severities.Any() ?
+                    (Core.DiagnosticSeverity)severities.First().Attribute.ConstructorArguments.FirstOrDefault(f => f.Type.TypeKind == TypeKind.Enum).Value :
+                    Core.DiagnosticSeverity.Error;
+
+                result.Add(new AttributeInfo
+                {
+                    AttributeData = attr.Attribute,
+                    Severity = severity
+                });
+            }
+            return result;
         }
     }
 }

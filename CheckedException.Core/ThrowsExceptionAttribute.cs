@@ -14,11 +14,6 @@ namespace CheckedException.Core
             this.ExceptionType = exceptionType;
         }
 
-        public ThrowsExceptionAttribute(DiagnosticSeverity severity)
-        {
-            Severity = severity;
-        }
-
         public ThrowsExceptionAttribute(Type exceptionType, DiagnosticSeverity severity)
         {
             this.ExceptionType = exceptionType;

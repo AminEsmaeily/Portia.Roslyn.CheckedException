@@ -61,7 +61,8 @@ namespace CheckedException
             //var methodAttribs = completeMethod.Parent.FirstAncestorOrSelf<MethodDeclarationSyntax>().AttributeLists;
 
             SemanticModel sm = await document.GetSemanticModelAsync();
-            var attribs = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
+            var defaultSeverity = Core.DiagnosticSeverity.Error;
+            var attribs = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod, ref defaultSeverity);
 
             var tryElement = invocation.Parent.FirstAncestorOrSelf<TryStatementSyntax>();
 
@@ -73,24 +74,11 @@ namespace CheckedException
             {
                 var typeName = "";
                 // I used this way because of the exception described in https://github.com/dotnet/roslyn/issues/6226
-                foreach (var item in attrib.ConstructorArguments)
+                foreach (var item in attrib.AttributeData.ConstructorArguments)
                 {
                     typeName = item.Value.ToString();
                     break;
                 }
-
-                /*var attribItems = from element in methodAttribs
-                                  from identifier in element.DescendantNodes().OfType<IdentifierNameSyntax>()
-                                  from argument in element.DescendantNodes().OfType<AttributeArgumentSyntax>()
-                                  from identifier2 in argument.DescendantNodes().OfType<IdentifierNameSyntax>()
-                                  let identifierType = sm.GetTypeInfo(identifier)
-                                  let identifier2Type = sm.GetTypeInfo(identifier2)
-                                  where identifierType.Type != null && identifierType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName) &&
-                                        identifier2Type.Type != null && identifier2Type.Type.ToString().Equals(typeName)
-                                  select element;
-
-                if (attribItems.Any())
-                    continue;*/
 
                 bool createCatchPart = tryElement == null;
                 if (!createCatchPart)
