@@ -14,7 +14,7 @@ namespace CheckedException
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CheckedExceptionAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "CheckedException";
+        public const string DiagnosticId = "SAE001";
         
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
@@ -81,13 +81,24 @@ namespace CheckedException
                 if (identifierType.Type == null || !identifierType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName))
                     continue;
 
-                var attributeArgs = attributeIdentifier.DescendantNodes().OfType<AttributeArgumentListSyntax>();
+                var attributeArgs = attribute.DescendantNodes().OfType<AttributeArgumentListSyntax>();
                 if (!attributeArgs.Any()) // It consist of all exception types
                     return;
 
-                foreach(var argument in attributeArgs)
+                foreach (var argument in attributeArgs)
                 {
-                    var argumentIdentifier = argument
+                    var typeOf = argument.DescendantNodes().OfType<TypeOfExpressionSyntax>();
+                    if (typeOf != null && typeOf.Any())
+                    {
+                        var identifiers = typeOf.First().DescendantNodes().OfType<IdentifierNameSyntax>();
+                        if (identifiers != null && identifiers.Any())
+                        {
+                            var semanticType = context.SemanticModel.GetTypeInfo(identifiers.First()).Type;
+                            if (semanticType != null && semanticType.ToString().Equals(attributeArgument))
+                                return;
+                        }
+                    }
+                    else return;
                 }
             }
 

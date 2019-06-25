@@ -129,4 +129,13 @@
     <value>The exception is not handled in code</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="FixByAnnotation" xml:space="preserve">
+    <value>Fix using general attribute</value>
+  </data>
+  <data name="FixByExactAnnotation" xml:space="preserve">
+    <value>Fix using exact exception attribute</value>
+  </data>
+  <data name="FixByTryCatch" xml:space="preserve">
+    <value>Fix using Try-Catch</value>
+  </data>
 </root>

@@ -87,5 +87,32 @@ namespace CheckedException {
                 return ResourceManager.GetString("AnalyzerTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix using general attribute.
+        /// </summary>
+        internal static string FixByAnnotation {
+            get {
+                return ResourceManager.GetString("FixByAnnotation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix using exact exception attribute.
+        /// </summary>
+        internal static string FixByExactAnnotation {
+            get {
+                return ResourceManager.GetString("FixByExactAnnotation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix using Try-Catch.
+        /// </summary>
+        internal static string FixByTryCatch {
+            get {
+                return ResourceManager.GetString("FixByTryCatch", resourceCulture);
+            }
+        }
     }
 }

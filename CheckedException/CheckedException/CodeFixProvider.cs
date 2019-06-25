@@ -17,8 +17,6 @@ namespace CheckedException
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CheckedExceptionCodeFixProvider)), Shared]
     public class CheckedExceptionCodeFixProvider : CodeFixProvider
     {
-        private const string tryCatchTitle = "Add Try-Catch element";
-
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
             get { return ImmutableArray.Create(CheckedExceptionAnalyzer.DiagnosticId); }
@@ -31,15 +29,23 @@ namespace CheckedException
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
-
-
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: tryCatchTitle,
-                    createChangedDocument: c => AddTryCatchAsync(context, c),
-                    equivalenceKey: "Equivalency**"),
+                    title: Resources.FixByTryCatch,
+                    createChangedDocument: c => AddTryCatchAsync(context, c)),
+                context.Diagnostics.First());
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: Resources.FixByExactAnnotation,
+                    createChangedDocument: f => AddAnnotationAsync(context, f, false)),
+                context.Diagnostics.First());
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: Resources.FixByAnnotation,
+                    createChangedDocument: f => AddAnnotationAsync(context, f, true)),
                 context.Diagnostics.First());
         }
 
@@ -52,7 +58,7 @@ namespace CheckedException
             SyntaxToken invocation = root.FindToken(diagnosticSpan.Start);
 
             InvocationExpressionSyntax completeMethod = invocation.Parent.FirstAncestorOrSelf<InvocationExpressionSyntax>();
-            var methodAttribs = completeMethod.Parent.FirstAncestorOrSelf<MethodDeclarationSyntax>().AttributeLists;
+            //var methodAttribs = completeMethod.Parent.FirstAncestorOrSelf<MethodDeclarationSyntax>().AttributeLists;
 
             SemanticModel sm = await document.GetSemanticModelAsync();
             var attribs = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
@@ -73,7 +79,7 @@ namespace CheckedException
                     break;
                 }
 
-                var attribItems = from element in methodAttribs
+                /*var attribItems = from element in methodAttribs
                                   from identifier in element.DescendantNodes().OfType<IdentifierNameSyntax>()
                                   from argument in element.DescendantNodes().OfType<AttributeArgumentSyntax>()
                                   from identifier2 in argument.DescendantNodes().OfType<IdentifierNameSyntax>()
@@ -84,7 +90,7 @@ namespace CheckedException
                                   select element;
 
                 if (attribItems.Any())
-                    continue;
+                    continue;*/
 
                 bool createCatchPart = tryElement == null;
                 if (!createCatchPart)
@@ -143,6 +149,11 @@ namespace CheckedException
             }
 
             return document.WithSyntaxRoot(newRoot);
+        }
+
+        private async Task<Document> AddAnnotationAsync(CodeFixContext context, CancellationToken cancellationToken, bool isGeneral)
+        {
+            return null;
         }
     }
 }
