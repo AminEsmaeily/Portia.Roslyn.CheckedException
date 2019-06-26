@@ -37,8 +37,7 @@ namespace CheckedException
         {
             try
             {
-                var defaultSeverity = Core.DiagnosticSeverity.Error;
-                var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node, ref defaultSeverity);
+                var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node);
 
                 //diagnosticReported = false;
                 foreach (var attrib in attribs)
@@ -76,7 +75,12 @@ namespace CheckedException
 
             foreach(var attribute in allAttributes)
             {
-                var attributeIdentifier = attribute.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                IdentifierNameSyntax attributeIdentifier = null;
+                var qualifiedName = attribute.DescendantNodesAndSelf().OfType<QualifiedNameSyntax>().FirstOrDefault();
+                if (qualifiedName == null)
+                    attributeIdentifier = attribute.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                else
+                    attributeIdentifier = qualifiedName.DescendantNodes().OfType<IdentifierNameSyntax>().Last();
                 if (attributeIdentifier == null)
                     continue;
                 var identifierType = context.SemanticModel.GetTypeInfo((IdentifierNameSyntax)attributeIdentifier);
@@ -139,13 +143,14 @@ namespace CheckedException
             }
             ////////////////////////////////////////////////////////
 
-            Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
+            Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, 
+                (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
             Diagnostic diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), attributeArgument);
             context.ReportDiagnostic(diagnostic);
             //diagnosticReported = true;
         }
 
-        public static List<AttributeInfo> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method, ref Core.DiagnosticSeverity defaultSeverity)
+        public static List<AttributeInfo> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method)
         {
             var info = semanticModel.GetSymbolInfo(method).Symbol;            
             if (info == null)

@@ -89,6 +89,15 @@ namespace CheckedException {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fix all using TryCatch.
+        /// </summary>
+        internal static string FixAllByTryCatch {
+            get {
+                return ResourceManager.GetString("FixAllByTryCatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fix using general attribute.
         /// </summary>
         internal static string FixByAnnotation {
@@ -107,7 +116,7 @@ namespace CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix using Try-Catch.
+        ///   Looks up a localized string similar to Fix using TryCatch.
         /// </summary>
         internal static string FixByTryCatch {
             get {
