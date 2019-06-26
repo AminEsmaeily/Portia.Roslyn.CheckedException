@@ -69,8 +69,8 @@ namespace CheckedException
             if (callerMethod == null || callerClass == null)
                 return;
 
-            var allAttributes = ((MethodDeclarationSyntax)callerMethod).DescendantNodes().OfType<AttributeSyntax>()
-                .Union(((ClassDeclarationSyntax)callerClass).DescendantNodes().OfType<AttributeSyntax>())
+            var allAttributes = ((MethodDeclarationSyntax)callerMethod).AttributeLists
+                .Union(((ClassDeclarationSyntax)callerClass).AttributeLists)
                 .ToList();
 
             foreach(var attribute in allAttributes)

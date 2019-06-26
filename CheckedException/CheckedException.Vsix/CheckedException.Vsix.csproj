@@ -77,6 +77,9 @@
     <ProjectReference Include="..\..\CheckedException.Core\CheckedException.Core.csproj">
       <Project>{366ff570-d5f7-4fcb-afd2-a2733ba9b1a1}</Project>
       <Name>CheckedException.Core</Name>
+      <VSIXSubPath>Dependencies</VSIXSubPath>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\CheckedException\CheckedException.csproj">
       <Project>{B81C3C1B-ADD8-4D2E-91D1-42A9E2D210B2}</Project>

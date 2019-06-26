@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>CheckedException</id>
-    <version>1.0.0.0</version>
-    <title>CheckedException</title>
-    <authors>Amin</authors>
-    <owners>Amin</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
-    <projectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</projectUrl>
-    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>CheckedException</description>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
-    <copyright>Copyright</copyright>
-    <tags>CheckedException, analyzers</tags>
+    <id>Portia.Roslyn.CheckedException</id>
+    <version>1.1.1-beta</version>
+    <title>Checked Exception</title>
+    <authors>Amin Esmaeily</authors>
+    <owners>Amin Esmaeily</owners>
+    <licenseUrl>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/icon/bug32.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This analyzer allows the developers to inform others about the methods that can throw exception.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright @2019</copyright>
+    <tags>CheckedException, analyzers, Exception, ExceptionHandling</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />
     </frameworkAssemblies>
-    <developmentDependency>true</developmentDependency>
   </metadata>
   <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
   <files>
     <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
     <file src="tools\*.ps1" target="tools\" />
+	<file src="..\..\..\..\CheckedException.Core\bin\Release\*.dll" target="lib"/>
   </files>
 </package>

@@ -231,7 +231,7 @@ namespace CheckedException
             }
         }
 
-        private static async Task<IEnumerable<AttributeSyntax>> GetCallerAttributesAsync(CodeFixContext context, CancellationToken cancellationToken)
+        private static async Task<IEnumerable<AttributeListSyntax>> GetCallerAttributesAsync(CodeFixContext context, CancellationToken cancellationToken)
         {
             SemanticModel sm = await context.Document.GetSemanticModelAsync();
             var root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -243,8 +243,8 @@ namespace CheckedException
             SyntaxNode callerClass = invocation.Parent.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
             try
             {
-                var result = ((MethodDeclarationSyntax)callerMethod).DescendantNodes().OfType<AttributeSyntax>()
-                    .Union(((ClassDeclarationSyntax)callerClass).DescendantNodes().OfType<AttributeSyntax>())
+                var result = ((MethodDeclarationSyntax)callerMethod).AttributeLists
+                    .Union(((ClassDeclarationSyntax)callerClass).AttributeLists)
                     .Where(f => (f.DescendantNodes().OfType<QualifiedNameSyntax>().Any() &&
                                 sm.GetTypeInfo(f.DescendantNodes().OfType<QualifiedNameSyntax>().FirstOrDefault()).Type != null &&
                                 sm.GetTypeInfo(f.DescendantNodes().OfType<QualifiedNameSyntax>().FirstOrDefault()
