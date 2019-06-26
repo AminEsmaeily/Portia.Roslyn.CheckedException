@@ -98,20 +98,11 @@ namespace CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fix using general attribute.
+        ///   Looks up a localized string similar to Fix using Attribute.
         /// </summary>
         internal static string FixByAnnotation {
             get {
                 return ResourceManager.GetString("FixByAnnotation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fix using exact exception attribute.
-        /// </summary>
-        internal static string FixByExactAnnotation {
-            get {
-                return ResourceManager.GetString("FixByExactAnnotation", resourceCulture);
             }
         }
         

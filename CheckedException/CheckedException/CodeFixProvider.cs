@@ -38,7 +38,7 @@ namespace CheckedException
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: Resources.FixByExactAnnotation,
+                    title: Resources.FixByAnnotation,
                     createChangedDocument: f => AddAnnotationAsync(context, f)),
                 context.Diagnostics);
         }
