@@ -1,45 +1,59 @@
-# Portia.Roslyn.CheckedException
+## CheckedException
+![Logo](https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/icon/bug64.png)
 
-##   
-Checked Exception in C# Using Roslyn
+[Checked Exception](https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions "Checked Exception") is a feature that has been supported by some of the languages like JAVA. It helps to inform the method callers of the exceptions that can be thrown inside the method. The exception problem can become more sensitive when we want to use a method from a library and we don't know any think about its business. Then we should guess the exceptions and perform a good reaction against them. But it cannot be a good solution to our problem, because, most of the times we should know the type of the exception and handle it in its way. So the best way is making the method callers aware about the exceptions that this method can throw. In JAVA, we can use `throws` phrase to announce the exceptions that a method can throw, but, unfortunately, in C# we don't have any built-in feature like this. **CheckedException** can handle it to C# developers. It uses the attributes to announce the callers about the callees exceptions, and also it ships a good feature and it is Severity. We can set the severity for the exceptions to tell the callers how important the exception is.
 
-    [Checked Exception](https://en.wikibooks.org/wiki/Java_Programming/Checked_Exceptions "Checked Exception") is an ability of JAVA language which enables solution designers and programmers to manage exceptions in any part/layer of the project. For example, if it is required to handle a custom exception thrown by an **External Library** in the backend of the project and perform an appropriate task for it, the programmer(designer) of the method should introduce that custom exception in the method declaration. After that, Users of this method can handle the throwable exception declared in method anywhere they want.
+![Sample](https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/2-2.0.gif)
 
-![Alt Text](https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/2-2.0.gif)
+### Getting started
+To use CheckedException, you should install it on your projects. To do this, you can enter the following command inside your Package Manager:
 
-    The most important benefit of **Checked Exception** is handling most unanticipated exceptions may be thrown by a method in another library. In this case, if the callee introduces all exceptions those should be handled by the caller, then the caller should handle these exceptions or rethrow them to its callers.  
+``` bash
+PM> Install-Package Portia.Roslyn.CheckedException
+```
 
-    There is not any feature like **Exception Handling** in C# and if the programmer does not know anything about exceptions may be thrown by the callee and doesn't handle them in code, It can produce bad actions in production.
+After installing this package, you can see CheckedException inside the Analyzers and CheckedException.Core inside the Packages part of your projects' references. The first one is an analyzer to check the exception usages and you don't have anything to do with this. But the second one is what actually you need in your classes.
 
-    In _**CheckedException**_ project of the **_Portia_** project, we created a Visual Studio extension(.VSIX) that can add the ability of JAVA's Checked Exception to C#. It makes Programmers and Solution Designers be able to design layers and methods with less risk of unhandled exceptions. They can handle exceptions in any layer they want and have a good _Stack Trace_ of the thrown exceptions. To use this extension you should add a reference to **Portia.Roslyn.Base** library and after that, add _CheckedException.Base.ThrowsExceptionAttribute_ annotation to top of the method like this:  
+![References](https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/img_20190626.png)
 
-**C#**  
-[CheckedException.Base.ThrowsException(typeof(InvalidCastException))]  
-public static long AddNumbers(int a, bool b)  
-{  
-    return a + Convert.ToInt32(b);  
-}  
-[CheckedException.Base.ThrowsException(typeof(DivideByZeroException))]  
-public static double DivideNumbers(int a, int b)  
-{  
-    return a / b;  
-}  
+#### How to use it
+First of all, you should include CheckedException.Core namespace in your class. Then you can add ThrowsExceptionAttribute before your class or methods. This attribute comes with two constructors. The first one gets the type of exception that can be thrown from the method, but the second one gets the type of exception and its severity.
 
-    _CheckedException.Base.ThrowsExceptionAttribute_ has one constructor parameter that accepts a type. You can give it any type you want, but it won't work for you if the type you gave is not a subclass of **System.Exeption**; So it's better to give it a type that is inherited from **System.Exception** ;). If developer/designer wants to rethrow the exception thrown from submethod, he/she can add same attribute on top of his/her method; or if he/she wants to handle the exception on threw, he/she can use a try-catch block.
+#### Types of use
+* ***Class***: You can declare the ThrowsException attribute before the class. In this case, you force all of the methods inside the class to inform the users about the exception.
+* ***Method***: In addition of the exceptions declared for the class, each method can have its exceptions too. Also, it can override the severity level of an exception that has been declared for the entire class.
 
-###   
-How does it work
+In the following code, you can see the usage of this extension:
 
-####   
-Analyzer
+``` cs
 
-    In analyzer part, I inherited my analyzer from **DiagnosticAnalyzer**. It helps me to register syntax node action for detecting only invocations using _context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);_. In **SyntaxNodeAnalyze** method I fetch all of the attributes with the type of **ThrowsExcepionAttribute** from the invoked method. After that, for each one of the fetched items, I check the state of the exception handling for an introduced exception. Inside of the **CheckExceptionHandling** method, I check two types of handling:
+using CheckedException.Core;
+using System;
 
-*   Rethrow using Data Annotation(ThrowsExceptionAttribute)
-*   Using try-catch block around the method
+[ThrowsException(typeof(ArithmeticException), DiagnosticSeverity.Error)]
+public static class MathHelper
+{
+    [ThrowsException(typeof(DivideByZeroException))]
+    public static double Divide(long nominator, long denominator)
+    {
+        return nominator / denominator;
+    }
 
-If non of desired ways has been found in the caller, I report a _Diagnostic_ to inform the programmer of the exception.
+    [ThrowsException(typeof(ArgumentOutOfRangeException), DiagnosticSeverity.Warning)]
+    [ThrowsException(typeof(ArithmeticException), DiagnosticSeverity.Warning)]
+    public static long Add(long number1, long number2)
+    {
+        return number1 + number2;
+    }
+}
+```
 
-#### Code Fixer
+Depends on the severity of the exception, the compiler shows a message about the exception with code **SAE001** whenever you use a method that throws the exception. To fix this error, as the code fixer suggests, you can either wrap the line inside a TryCatch or rethrow the error by adding the *ThrowsExceptionAttribute* on top of the caller method or class.
 
-    To refactor the code and making changes in code to solve the problem, I fetch all of the attributes again just like the analyzer. If an exception is not handled in code, I look after the try-catch block around method invocation. If I find a try-catch block, then I add a new **Catch** block to the try, else, I add a complete try-catch block around the invocation.
+#### Severity
+As discussed [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019#rule-severity), there are 5 types of severities declared, but here, in Roslyn, we only have 4 of them:
+**Error**,
+**Warning**,
+**Info**,
+and **Hidden**.
+Then when you want to set the severity of an exception, you can choose one of the above options.
