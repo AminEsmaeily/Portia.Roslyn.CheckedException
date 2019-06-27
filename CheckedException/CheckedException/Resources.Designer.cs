@@ -62,7 +62,7 @@ namespace CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method &apos;{0}&apos; might have thrown exception of type {1}, and it is not handled in code..
+        ///   Looks up a localized string similar to This method might have thrown an exception, but it isn&apos;t handled in code. Please use either TryCatch to handle or rethrow it using ThrowsExceptionAttribute to announce your methods&apos; caller about this exception..
         /// </summary>
         internal static string AnalyzerDescription {
             get {
