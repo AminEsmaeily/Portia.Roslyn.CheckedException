@@ -124,8 +124,7 @@ namespace CheckedException
 
                     createCatchPart = !exists;
                 }
-
-                //if (tryElement == null || !tryElement.Catches.Any(f => f.Declaration.Type is IdentifierNameSyntax && ((IdentifierNameSyntax)f.Declaration.Type).Identifier.Text.Equals(typeName)))
+                
                 if (createCatchPart)
                 {
                     IdentifierNameSyntax catchTypeSyntax = SyntaxFactory.IdentifierName(exceptionName);
@@ -137,20 +136,25 @@ namespace CheckedException
                 }
             }
 
-            if (tryElement != null)
-                newRoot = oldRoot.InsertNodesAfter(tryElement.Catches.Last(), catches);
-            else
+            try
             {
-                ExpressionStatementSyntax body = completeMethod.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                var expressionIndex = body.Parent.ChildNodesAndTokens().ToList().IndexOf(body);
-                var prevSyntax = (SyntaxNode)body.Parent.ChildNodesAndTokens().ToList()[expressionIndex - 1];
-                BlockSyntax block = SyntaxFactory.Block(body);
+                if (tryElement != null)
+                    newRoot = oldRoot.InsertNodesAfter(tryElement.Catches.Last(), catches);
+                else
+                {
+                    var body = completeMethod.FirstAncestorOrSelf<StatementSyntax>();
+                    var expressionIndex = body.Parent.ChildNodesAndTokens().ToList().IndexOf(body);
+                    BlockSyntax block = SyntaxFactory.Block(body);
 
+                    TryStatementSyntax trySyntax = SyntaxFactory.TryStatement(block, new SyntaxList<CatchClauseSyntax>(), null);
+                    trySyntax = trySyntax.AddCatches(catches.ToArray()).NormalizeWhitespace(elasticTrivia:true);
 
-                TryStatementSyntax trySyntax = SyntaxFactory.TryStatement(block, new SyntaxList<CatchClauseSyntax>(), null);
-                trySyntax = trySyntax.AddCatches(catches.ToArray());
-
-                newRoot = oldRoot.ReplaceNode(body, trySyntax);
+                    newRoot = oldRoot.ReplaceNode(body, trySyntax);
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
             }
 
             return document.WithSyntaxRoot(newRoot);
