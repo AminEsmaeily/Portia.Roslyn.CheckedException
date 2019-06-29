@@ -7,6 +7,7 @@ namespace CheckedException.Test.NetCore
     {
         public void MainMethod()
         {
+            //// Local class
             MethodWithoutReturnValue(); // Expression Statement
 
             Console.WriteLine(MethodWithReturnValue()); // Expression Statement
@@ -19,6 +20,23 @@ namespace CheckedException.Test.NetCore
 
             while(MethodWithReturnValue() == 5) // While Statement
             { }
+            //////////////////////
+
+            //// Direct Class
+            var directClass = new DirectClass();
+
+            directClass.MethodWithoutReturnValue();
+
+            directClass.MethodWithReturnValue();
+            //////////////////////
+
+            // Interface based
+            IInterfaceBased interfaceBased = new InterfaceBased();
+
+            interfaceBased.MethodWithoutReturnValue();
+
+            interfaceBased.MethodWithReturnValue();
+            //////////////////////
         }
 
         [ThrowsException(typeof(InvalidOperationException))]

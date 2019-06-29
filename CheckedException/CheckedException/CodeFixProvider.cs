@@ -147,7 +147,7 @@ namespace CheckedException
                     BlockSyntax block = SyntaxFactory.Block(body);
 
                     TryStatementSyntax trySyntax = SyntaxFactory.TryStatement(block, new SyntaxList<CatchClauseSyntax>(), null);
-                    trySyntax = trySyntax.AddCatches(catches.ToArray()).NormalizeWhitespace();
+                    trySyntax = trySyntax.AddCatches(catches.ToArray()).NormalizeWhitespace(elasticTrivia:true);
 
                     newRoot = oldRoot.ReplaceNode(body, trySyntax);
                 }
