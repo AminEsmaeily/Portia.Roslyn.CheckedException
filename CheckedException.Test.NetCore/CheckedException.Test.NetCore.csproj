@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>CheckedException.Test.NetCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="CheckedException.Core">
+      <HintPath>..\CheckedException.Core\bin\Release\CheckedException.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
