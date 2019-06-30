@@ -8,7 +8,7 @@ namespace CheckedException.Test.NetCore
         [ThrowsException(typeof(ArrayTypeMismatchException))]
         void MethodWithoutReturnValue();
 
-        [ThrowsException(typeof(ArgumentOutOfRangeException))]
+        [ThrowsException(typeof(System.ArgumentOutOfRangeException))]
         int MethodWithReturnValue();
     }
 }
