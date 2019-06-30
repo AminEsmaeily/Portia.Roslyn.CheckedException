@@ -59,5 +59,13 @@ namespace CheckedException.Test.NetCore
         {
             return 10;
         }
+
+        [ThrowsException(typeof(FormatException), DiagnosticSeverity.Error)]
+        [ThrowsException(typeof(FormatException), DiagnosticSeverity.Warning)]
+        [ThrowsException(typeof(FormatException))]
+        private void DuplicateAttributeUsage()
+        {
+
+        }
     }
 }

@@ -15,36 +15,45 @@ namespace CheckedException
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CheckedExceptionAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "SAE001";
-        
-        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string Category = "Exception Handling";
+        public const string NotHandledDiagnosticId = "SAE001";
+        public const string DuplicateAttributeDiagnosticId = "SAE002";
+        
+        private static readonly LocalizableString NotHandledTitle = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString NotHandledMessageFormat = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString NotHandledDescription = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+
+        private static readonly LocalizableString DuplicateAttributeTitle = new LocalizableResourceString(nameof(Resources.DuplicateAttributeAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString DuplicateAttributeMessageFormat = new LocalizableResourceString(nameof(Resources.DuplicateAttributeAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
 
         //private static bool diagnosticReported = false;
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+        private static DiagnosticDescriptor NotHandledRule = new DiagnosticDescriptor(NotHandledDiagnosticId, NotHandledTitle, NotHandledMessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: NotHandledDescription);
+        private static DiagnosticDescriptor DuplicateAttributeRule = new DiagnosticDescriptor(DuplicateAttributeDiagnosticId, DuplicateAttributeTitle, DuplicateAttributeMessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Resources.DuplicateAttributeAnalyzerDescription);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        {
+            get
+            {
+                return ImmutableArray.Create(NotHandledRule, DuplicateAttributeRule);
+            }
+        }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(InvocationAnalyzer, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(MethodDeclarationAnalyzer, SyntaxKind.MethodDeclaration);
         }
 
-        private static void SyntaxNodeAnalyze(SyntaxNodeAnalysisContext context)
+        private static void InvocationAnalyzer(SyntaxNodeAnalysisContext context)
         {
             try
             {
                 var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node);
 
-                //diagnosticReported = false;
                 foreach (var attrib in attribs)
                 {
                     CheckExceptionHandling(attrib, context);
-                    /*if (diagnosticReported)
-                        break;*/
                 }
             }
             catch (Exception ex)
@@ -143,9 +152,9 @@ namespace CheckedException
             }
             ////////////////////////////////////////////////////////
 
-            Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, 
-                (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
-            Diagnostic diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), attributeArgument);
+            NotHandledRule = new DiagnosticDescriptor(NotHandledDiagnosticId, NotHandledTitle, NotHandledMessageFormat, Category, 
+                (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: NotHandledDescription);
+            Diagnostic diagnostic = Diagnostic.Create(NotHandledRule, context.Node.GetLocation(), attributeArgument);
             context.ReportDiagnostic(diagnostic);
             //diagnosticReported = true;
         }
@@ -191,6 +200,46 @@ namespace CheckedException
                 });
             }
             return result;
+        }
+
+        private static void MethodDeclarationAnalyzer(SyntaxNodeAnalysisContext context)
+        {
+            var method = (MethodDeclarationSyntax)context.Node;
+            var allAttributes = method.AttributeLists;
+            var checkedTypes = new List<TypeInfo>();
+            foreach(var attrib in allAttributes)
+            {
+                var typeOf = attrib.DescendantNodes().OfType<TypeOfExpressionSyntax>().FirstOrDefault();
+                if (typeOf == null)
+                    continue;
+
+                var exceptionType = typeOf.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                if (exceptionType == null)
+                    continue;
+
+                var info = context.SemanticModel.GetTypeInfo(exceptionType);
+                if (info.Type == null)
+                    continue;
+
+                bool exists = false;
+                foreach (var addedAttrib in checkedTypes)
+                {
+                    if (addedAttrib.Type.Name.Equals(info.Type.Name))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    checkedTypes.Add(info);
+                    continue;
+                }
+
+                Diagnostic diagnostic = Diagnostic.Create(DuplicateAttributeRule, attrib.GetLocation(), info.Type.Name);
+                context.ReportDiagnostic(diagnostic);
+            }
         }
     }
 }

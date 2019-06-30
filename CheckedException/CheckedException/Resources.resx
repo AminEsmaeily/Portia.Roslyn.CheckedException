@@ -117,25 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AnalyzerDescription" xml:space="preserve">
-    <value>This method might have thrown an exception, but it isn't handled in code. Please use either TryCatch to handle or rethrow it using ThrowsExceptionAttribute to announce your methods' caller about this exception.</value>
-    <comment>An optional longer localizable description of the diagnostic.</comment>
+  <data name="DuplicateAttributeAnalyzerDescription" xml:space="preserve">
+    <value />
   </data>
-  <data name="AnalyzerMessageFormat" xml:space="preserve">
-    <value>The exception of type {0} is not handled in code.</value>
-    <comment>The format-able message the diagnostic displays.</comment>
+  <data name="DuplicateAttributeAnalyzerMessageFormat" xml:space="preserve">
+    <value>Another attribute with the {0} exception type has been declared for this method. Please remove one of them.</value>
   </data>
-  <data name="AnalyzerTitle" xml:space="preserve">
-    <value>The exception is not handled in code</value>
-    <comment>The title of the diagnostic.</comment>
-  </data>
-  <data name="FixAllByTryCatch" xml:space="preserve">
-    <value>Fix all using TryCatch</value>
+  <data name="DuplicateAttributeAnalyzerTitle" xml:space="preserve">
+    <value>Another attribute with the same exception type has been declared.</value>
   </data>
   <data name="FixByAnnotation" xml:space="preserve">
     <value>Fix using Attribute</value>
   </data>
   <data name="FixByTryCatch" xml:space="preserve">
     <value>Fix using TryCatch</value>
+  </data>
+  <data name="NotHandledAnalyzerDescription" xml:space="preserve">
+    <value>This method might have thrown an exception, but it isn't handled in code. Please use either TryCatch to handle or rethrow it using ThrowsExceptionAttribute to announce your methods' caller about this exception.</value>
+    <comment>An optional longer localizable description of the diagnostic.</comment>
+  </data>
+  <data name="NotHandledAnalyzerMessageFormat" xml:space="preserve">
+    <value>The exception of type {0} is not handled in code.</value>
+    <comment>The format-able message the diagnostic displays.</comment>
+  </data>
+  <data name="NotHandledAnalyzerTitle" xml:space="preserve">
+    <value>The exception is not handled in code</value>
+    <comment>The title of the diagnostic.</comment>
+  </data>
+  <data name="RemoveDuplicateAttribute" xml:space="preserve">
+    <value>Remive Attribute</value>
   </data>
 </root>
