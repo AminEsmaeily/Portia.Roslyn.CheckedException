@@ -37,6 +37,15 @@ namespace CheckedException.Test.NetCore
 
             interfaceBased.MethodWithReturnValue();
             //////////////////////
+
+            // Abstract based
+            AAbstractBased abstractBased = new AbstractBased();
+            abstractBased.MethodWithoutReturnValue();
+
+            abstractBased.MethodWithReturnValue();
+
+            abstractBased.MethodToHide();
+            //////////////////////
         }
 
         [ThrowsException(typeof(InvalidOperationException))]

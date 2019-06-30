@@ -9,7 +9,7 @@
     <licenseUrl>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/icon/bug64.png</iconUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This analyzer allows the developers to inform others about the methods that can throw exception.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright @2019</copyright>
