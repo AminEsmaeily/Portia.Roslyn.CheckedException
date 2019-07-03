@@ -134,11 +134,47 @@ namespace CheckedException {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The container class of this method has a ThrowException attribute of this exception type, then this declaration is redundant here..
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The exception of type {0} has been declared for the class. This declaration is redundant here..
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The declared attribute is redundant.
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove duplicate attribute.
         /// </summary>
         internal static string RemoveDuplicateAttribute {
             get {
                 return ResourceManager.GetString("RemoveDuplicateAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove redundant attribute.
+        /// </summary>
+        internal static string RemoveRedundantAttribute {
+            get {
+                return ResourceManager.GetString("RemoveRedundantAttribute", resourceCulture);
             }
         }
     }

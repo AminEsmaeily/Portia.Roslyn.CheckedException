@@ -305,4 +305,37 @@ namespace CheckedException
             return document.WithSyntaxRoot(root);
         }
     }
+
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DuplicateCodeFixProvider)), Shared]
+    public class RedundantCodeFixProvider : CodeFixProvider
+    {
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(RedundantAnalyzer.DiagnosticId);
+
+        public sealed override FixAllProvider GetFixAllProvider()
+        {
+            return WellKnownFixAllProviders.BatchFixer;
+        }
+
+        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        {
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: Resources.RemoveRedundantAttribute,
+                    createChangedDocument: f => RemoveRedundantAttribute(context, f)),
+                context.Diagnostics);
+        }
+
+        private static async Task<Document> RemoveRedundantAttribute(CodeFixContext context, CancellationToken cancellationToken)
+        {
+            var document = context.Document;
+            var root = await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            var diagnostic = context.Diagnostics.First();
+            SyntaxToken invocation = root.FindToken(diagnostic.Location.SourceSpan.Start);
+
+            AttributeListSyntax attribute = invocation.Parent.AncestorsAndSelf().OfType<AttributeListSyntax>().FirstOrDefault();
+            root = root.RemoveNode(attribute, SyntaxRemoveOptions.AddElasticMarker);
+
+            return document.WithSyntaxRoot(root);
+        }
+    }
 }

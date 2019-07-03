@@ -144,7 +144,19 @@
     <value>The exception is not handled in code</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="RedundantAttributeAnalyzerDescription" xml:space="preserve">
+    <value>The container class of this method has a ThrowException attribute of this exception type, then this declaration is redundant here.</value>
+  </data>
+  <data name="RedundantAttributeAnalyzerMessageFormat" xml:space="preserve">
+    <value>The exception of type {0} has been declared for the class. This declaration is redundant here.</value>
+  </data>
+  <data name="RedundantAttributeAnalyzerTitle" xml:space="preserve">
+    <value>The declared attribute is redundant</value>
+  </data>
   <data name="RemoveDuplicateAttribute" xml:space="preserve">
     <value>Remove duplicate attribute</value>
+  </data>
+  <data name="RemoveRedundantAttribute" xml:space="preserve">
+    <value>Remove redundant attribute</value>
   </data>
 </root>

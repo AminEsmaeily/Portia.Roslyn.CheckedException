@@ -3,12 +3,14 @@ using System;
 
 namespace CheckedException.Test.NetCore
 {
+    [ThrowsException(typeof(InvalidOperationException))]
     public class MainTest
     {
+        [CheckedException.Core.ThrowsException(typeof(System.IO.FileNotFoundException))]
         public void MainMethod()
         {
             //// Local class
-            MethodWithoutReturnValue(); // Expression Statement
+            MethodWithoutReturnValue(); // Should be ommitted, because of the class attribute
 
             Console.WriteLine(MethodWithReturnValue()); // Expression Statement
 
@@ -25,7 +27,7 @@ namespace CheckedException.Test.NetCore
             //// Direct Class
             var directClass = new DirectClass();
 
-            directClass.MethodWithoutReturnValue();
+            directClass.MethodWithoutReturnValue(); // Should be ommitted, because of the method attribute
 
             directClass.MethodWithReturnValue();
             //////////////////////
@@ -48,13 +50,13 @@ namespace CheckedException.Test.NetCore
             //////////////////////
         }
 
-        [ThrowsException(typeof(InvalidOperationException))]
+        [ThrowsException(typeof(InvalidOperationException))] // Should show the SAE003 information
         private void MethodWithoutReturnValue()
-        {
+        { 
 
         }
 
-        [ThrowsException(typeof(ArgumentException), DiagnosticSeverity.Warning)]
+        [ThrowsException(typeof(ArgumentException), CheckedException.Core.DiagnosticSeverity.Warning)]
         private int MethodWithReturnValue()
         {
             return 10;
