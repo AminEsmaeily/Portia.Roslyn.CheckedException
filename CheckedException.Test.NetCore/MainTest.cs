@@ -54,15 +54,15 @@ namespace CheckedException.Test.NetCore
 
         }
 
-        [ThrowsException(typeof(ArgumentException))]
+        [ThrowsException(typeof(ArgumentException), DiagnosticSeverity.Warning)]
         private int MethodWithReturnValue()
         {
             return 10;
         }
 
         [ThrowsException(typeof(FormatException), DiagnosticSeverity.Error)]
-        [ThrowsException(typeof(FormatException), DiagnosticSeverity.Warning)]
-        [ThrowsException(typeof(FormatException))]
+        [ThrowsException(typeof(System.FormatException), DiagnosticSeverity.Warning)]
+        [CheckedException.Core.ThrowsException(typeof(FormatException))]
         private void DuplicateAttributeUsage()
         {
 

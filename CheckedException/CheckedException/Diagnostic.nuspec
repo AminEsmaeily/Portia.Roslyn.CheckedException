@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/AminEsmaeily/Portia.Roslyn.CheckedException</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/AminEsmaeily/Portia.Roslyn.CheckedException/master/Attachments/icon/bug64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This analyzer allows the developers to inform others about the methods that can throw exception.</description>
+    <description>This library is an analyzer and code fix provider based on Roslyn that allows developers to inform others of the exceptions which their methods can throw.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright @2019</copyright>
     <tags>CheckedException, analyzers, Exception, ExceptionHandling</tags>

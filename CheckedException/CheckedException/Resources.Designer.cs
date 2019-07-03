@@ -134,7 +134,7 @@ namespace CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remive Attribute.
+        ///   Looks up a localized string similar to Remove duplicate attribute.
         /// </summary>
         internal static string RemoveDuplicateAttribute {
             get {

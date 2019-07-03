@@ -145,6 +145,6 @@
     <comment>The title of the diagnostic.</comment>
   </data>
   <data name="RemoveDuplicateAttribute" xml:space="preserve">
-    <value>Remive Attribute</value>
+    <value>Remove duplicate attribute</value>
   </data>
 </root>

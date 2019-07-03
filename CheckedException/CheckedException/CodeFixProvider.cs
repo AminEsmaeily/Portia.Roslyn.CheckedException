@@ -15,13 +15,10 @@ using System.Threading.Tasks;
 
 namespace CheckedException
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CheckedExceptionCodeFixProvider)), Shared]
-    public class CheckedExceptionCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NotHandledCodeFixProvider)), Shared]
+    public class NotHandledCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds
-        {
-            get { return ImmutableArray.Create(CheckedExceptionAnalyzer.DiagnosticId); }
-        }
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(NotHandledAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -54,7 +51,7 @@ namespace CheckedException
             InvocationExpressionSyntax completeMethod = await GetInvokedMethodAsync(context, cancellationToken);
 
             SemanticModel sm = await document.GetSemanticModelAsync();
-            var calleeAttributes = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
+            var calleeAttributes = NotHandledAnalyzer.GetAllAttributes(sm, completeMethod);
             var catchedAttributes = await GetCallerAttributesAsync(context, cancellationToken);
             var tryElement = invocation.Parent.FirstAncestorOrSelf<TryStatementSyntax>();
 
@@ -172,7 +169,7 @@ namespace CheckedException
 
             MethodDeclarationSyntax callerMethodContainer = (MethodDeclarationSyntax)invocation.Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
 
-            var calleeAttributes = CheckedExceptionAnalyzer.GetAllAttributes(sm, completeMethod);
+            var calleeAttributes = NotHandledAnalyzer.GetAllAttributes(sm, completeMethod);
             var catchedAttributes = await GetCallerAttributesAsync(context, cancellationToken);
 
             var newAttributes = new SyntaxList<AttributeListSyntax>();
@@ -273,6 +270,39 @@ namespace CheckedException
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             SyntaxToken invocation = root.FindToken(diagnosticSpan.Start);
             return invocation.Parent.FirstAncestorOrSelf<InvocationExpressionSyntax>();
+        }
+    }
+
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DuplicateCodeFixProvider)), Shared]
+    public class DuplicateCodeFixProvider : CodeFixProvider
+    {
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DuplicateAnalyzer.DiagnosticId);
+
+        public sealed override FixAllProvider GetFixAllProvider()
+        {
+            return WellKnownFixAllProviders.BatchFixer;
+        }
+
+        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        {
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: Resources.RemoveDuplicateAttribute,
+                    createChangedDocument: f => RemoveDuplicateAttribute(context, f)),
+                context.Diagnostics);
+        }
+
+        private static async Task<Document> RemoveDuplicateAttribute(CodeFixContext context, CancellationToken cancellationToken)
+        {
+            var document = context.Document;
+            var root = await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            var diagnostic = context.Diagnostics.First();
+            SyntaxToken invocation = root.FindToken(diagnostic.Location.SourceSpan.Start);
+
+            AttributeListSyntax attribute = invocation.Parent.AncestorsAndSelf().OfType<AttributeListSyntax>().FirstOrDefault();
+            root = root.RemoveNode(attribute, SyntaxRemoveOptions.KeepNoTrivia);
+
+            return document.WithSyntaxRoot(root);
         }
     }
 }
