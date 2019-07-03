@@ -13,38 +13,39 @@ using System.Linq;
 namespace CheckedException
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class CheckedExceptionAnalyzer : DiagnosticAnalyzer
+    public class NotHandledAnalyzer : DiagnosticAnalyzer
     {
+        private const string Category = "Exception Handling";
         public const string DiagnosticId = "SAE001";
         
-        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-        private const string Category = "Exception Handling";
+        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString FormattedMessage = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.NotHandledAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
 
-        //private static bool diagnosticReported = false;
+        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, FormattedMessage, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        {
+            get
+            {
+                return ImmutableArray.Create(Rule);
+            }
+        }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(SyntaxNodeAnalyze, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(InvocationAnalyzer, SyntaxKind.InvocationExpression);
         }
 
-        private static void SyntaxNodeAnalyze(SyntaxNodeAnalysisContext context)
+        private static void InvocationAnalyzer(SyntaxNodeAnalysisContext context)
         {
             try
             {
                 var attribs = GetAllAttributes(context.SemanticModel, (InvocationExpressionSyntax)context.Node);
 
-                //diagnosticReported = false;
                 foreach (var attrib in attribs)
                 {
                     CheckExceptionHandling(attrib, context);
-                    /*if (diagnosticReported)
-                        break;*/
                 }
             }
             catch (Exception ex)
@@ -55,70 +56,27 @@ namespace CheckedException
 
         private static void CheckExceptionHandling(AttributeInfo throwExceptionAttrib, SyntaxNodeAnalysisContext context)
         {
-            var attributeArgument = "";
-            
-            foreach (var item in throwExceptionAttrib.AttributeData.ConstructorArguments)
-            {
-                attributeArgument = item.Value.ToString();
-                break;
-            }
+            if (!throwExceptionAttrib.AttributeData.ConstructorArguments.Any())
+                return;
 
-            SyntaxNode callerMethod = context.Node.Parent.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-            SyntaxNode callerClass = context.Node.Parent.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+            var attributeArgument = throwExceptionAttrib.AttributeData.ConstructorArguments.First().Value.ToString();
+
+            MethodDeclarationSyntax callerMethod = context.Node.Parent.FirstAncestorOrSelf<MethodDeclarationSyntax>();
+            ClassDeclarationSyntax callerClass = context.Node.Parent.FirstAncestorOrSelf<ClassDeclarationSyntax>();
 
             if (callerMethod == null || callerClass == null)
                 return;
 
-            var allAttributes = ((MethodDeclarationSyntax)callerMethod).AttributeLists
-                .Union(((ClassDeclarationSyntax)callerClass).AttributeLists)
+            var callerClassAndMethodsAttributes = callerMethod.AttributeLists
+                .Union(callerClass.AttributeLists)
                 .ToList();
 
-            foreach(var attribute in allAttributes)
-            {
-                IdentifierNameSyntax attributeIdentifier = null;
-                var qualifiedName = attribute.DescendantNodesAndSelf().OfType<QualifiedNameSyntax>().FirstOrDefault();
-                if (qualifiedName == null)
-                    attributeIdentifier = attribute.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-                else
-                    attributeIdentifier = qualifiedName.DescendantNodes().OfType<IdentifierNameSyntax>().Last();
-                if (attributeIdentifier == null)
-                    continue;
-                var identifierType = context.SemanticModel.GetTypeInfo((IdentifierNameSyntax)attributeIdentifier);
-                if (identifierType.Type == null || !identifierType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName))
-                    continue;
+            var detectedAttributes = from attributeList in callerClassAndMethodsAttributes
+                                     let info = RedundantAnalyzer.GetAttributeParameterType(context, attributeList)
+                                     where info != null && info.ToString().Equals(attributeArgument)
+                                     select attributeList;
 
-                var attributeArgs = attribute.DescendantNodes().OfType<AttributeArgumentListSyntax>();
-                if (!attributeArgs.Any()) // It consist of all exception types
-                    return;
-
-                foreach (var argument in attributeArgs)
-                {
-                    var typeOf = argument.DescendantNodes().OfType<TypeOfExpressionSyntax>();
-                    if (typeOf != null && typeOf.Any())
-                    {
-                        var identifiers = typeOf.First().DescendantNodes().OfType<IdentifierNameSyntax>();
-                        if (identifiers != null && identifiers.Any())
-                        {
-                            var semanticType = context.SemanticModel.GetTypeInfo(identifiers.First()).Type;
-                            if (semanticType != null && semanticType.ToString().Equals(attributeArgument))
-                                return;
-                        }
-                    }
-                    else return;
-                }
-            }
-
-            var callerMethodAttribs = from attrib in ((MethodDeclarationSyntax)callerMethod).DescendantNodes().OfType<AttributeSyntax>()
-                          from throwsIdentifier in attrib.DescendantNodes().OfType<IdentifierNameSyntax>()
-                          from attribArgument in attrib.DescendantNodes().OfType<AttributeArgumentSyntax>()
-                          from identifier in attribArgument.DescendantNodes().OfType<IdentifierNameSyntax>()
-                          let throwsType = context.SemanticModel.GetTypeInfo(throwsIdentifier)
-                          let identifierType = context.SemanticModel.GetTypeInfo(identifier)
-                          where throwsType.Type != null && throwsType.Type.ToString().Equals(typeof(ThrowsExceptionAttribute).FullName) &&
-                                identifierType.Type != null && identifierType.Type.ToString().Equals(attributeArgument)
-                          select attrib;
-
-            if (callerMethodAttribs.Any())
+            if (detectedAttributes.Any())
                 return;
 
             // Checking try catch block
@@ -143,11 +101,10 @@ namespace CheckedException
             }
             ////////////////////////////////////////////////////////
 
-            Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, 
+            Rule = new DiagnosticDescriptor(DiagnosticId, Title, FormattedMessage, Category, 
                 (Microsoft.CodeAnalysis.DiagnosticSeverity)throwExceptionAttrib.Severity, isEnabledByDefault: true, description: Description);
             Diagnostic diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), attributeArgument);
             context.ReportDiagnostic(diagnostic);
-            //diagnosticReported = true;
         }
 
         public static List<AttributeInfo> GetAllAttributes(SemanticModel semanticModel, InvocationExpressionSyntax method)
@@ -169,20 +126,26 @@ namespace CheckedException
                 }));
 
             var result = new List<AttributeInfo>();
-            foreach(var attr in methodAttributes)
+            foreach (var attr in methodAttributes)
             {
                 var exceptionType = attr.Attribute.ConstructorArguments.FirstOrDefault(f => f.Type.TypeKind == TypeKind.Class);
 
-                if (exceptionType.Type == null || 
+                if (exceptionType.Type == null ||
                     result.Any(f => f.AttributeData.ConstructorArguments.FirstOrDefault(g => g.Type.TypeKind == TypeKind.Class).Value == exceptionType.Value))
                     continue;
 
                 var severities = methodAttributes.Where(f => f.Attribute.ConstructorArguments.Any(g => g.Type.TypeKind == TypeKind.Class && g.Value == exceptionType.Value) &&
                                                              f.Attribute.ConstructorArguments.Any(x => x.Type.TypeKind == TypeKind.Enum))
                                                  .OrderBy(f => f.Order);
-                Core.DiagnosticSeverity severity = severities.Any() ?
-                    (Core.DiagnosticSeverity)severities.First().Attribute.ConstructorArguments.FirstOrDefault(f => f.Type.TypeKind == TypeKind.Enum).Value :
-                    Core.DiagnosticSeverity.Error;
+
+                Core.DiagnosticSeverity severity = Core.DiagnosticSeverity.Error;
+                if (severities.Any() &&
+                    severities.First().Attribute.ConstructorArguments.Any(f => f.Type.TypeKind == TypeKind.Enum))
+                {
+                    var sev = severities.First().Attribute.ConstructorArguments.FirstOrDefault(f => f.Type.TypeKind == TypeKind.Enum);
+                    if (sev.Value != null)
+                        severity = (Core.DiagnosticSeverity)sev.Value;
+                }
 
                 result.Add(new AttributeInfo
                 {
@@ -190,6 +153,183 @@ namespace CheckedException
                     Severity = severity
                 });
             }
+            return result;
+        }
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class DuplicateAnalyzer : DiagnosticAnalyzer
+    {
+        private const string Category = "Exception Handling";
+        public const string DiagnosticId = "SAE002";
+        
+        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.DuplicateAttributeAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString FormattedMessage = new LocalizableResourceString(nameof(Resources.DuplicateAttributeAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.DuplicateAttributeAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+
+        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, FormattedMessage, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.RegisterSyntaxNodeAction(MethodDeclarationAnalyzer, SyntaxKind.MethodDeclaration);
+        }
+
+        private static void MethodDeclarationAnalyzer(SyntaxNodeAnalysisContext context)
+        {
+            var method = (MethodDeclarationSyntax)context.Node;
+            var allAttributes = method.AttributeLists;
+            var checkedTypes = new List<ITypeSymbol>();
+            foreach(var attrib in allAttributes)
+            {
+                var info = RedundantAnalyzer.GetAttributeParameterType(context, attrib);
+                if (info == null)
+                    continue;
+
+                bool exists = false;
+                foreach (var addedAttrib in checkedTypes)
+                {
+                    if (addedAttrib.Name.Equals(info.Name))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    checkedTypes.Add(info);
+                    continue;
+                }
+
+                Diagnostic diagnostic = Diagnostic.Create(Rule, attrib.GetLocation(), info.Name);
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class RedundantAnalyzer : DiagnosticAnalyzer
+    {
+        private const string Category = "Exception Handling";
+        public const string DiagnosticId = "SAE003";
+
+        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.RedundantAttributeAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString FormattedMessage = new LocalizableResourceString(nameof(Resources.RedundantAttributeAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.RedundantAttributeAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+
+        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, FormattedMessage, Category, Microsoft.CodeAnalysis.DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.RegisterSyntaxNodeAction(MethodDeclarationAnalyzer, SyntaxKind.MethodDeclaration);
+        }
+
+        private static void MethodDeclarationAnalyzer(SyntaxNodeAnalysisContext context)
+        {
+            var method = (MethodDeclarationSyntax)context.Node;
+            var methodAttributes = method.AttributeLists;
+            var classAttributes = method.FirstAncestorOrSelf<ClassDeclarationSyntax>().AttributeLists;
+
+            var repeatedAttributes = from classAttributeList in classAttributes
+                                     from methodAttributeList in methodAttributes
+                                     let classAttributeInfo = GetAttributeParameterType(context, classAttributeList)
+                                     let methodAttributeInfo = GetAttributeParameterType(context, methodAttributeList)
+                                     let classAttributeSeverity = GetAttributeParameterSeverity(context, classAttributeList)
+                                     let methodAttributeSeverity = GetAttributeParameterSeverity(context, methodAttributeList)
+                                     where classAttributeInfo != null && methodAttributeInfo != null &&
+                                        methodAttributeSeverity != null && classAttributeSeverity != null &&
+                                        classAttributeInfo.ToString().Equals(methodAttributeInfo.ToString()) &&
+                                        classAttributeSeverity == methodAttributeSeverity
+                                     select new { methodAttributeList, methodAttributeInfo };
+
+            foreach(var methodAttrib in repeatedAttributes)
+            {
+                Diagnostic diagnostic = Diagnostic.Create(Rule, methodAttrib.methodAttributeList.GetLocation(), methodAttrib.methodAttributeInfo.Name);
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+
+        public static ITypeSymbol GetAttributeParameterType(SyntaxNodeAnalysisContext context, AttributeListSyntax attrib)
+        {
+            if (attrib.ChildNodes().Count() == 0)
+                return null;
+
+            IdentifierNameSyntax attributeType = null;
+            if (attrib.ChildNodes().First().ChildNodes().FirstOrDefault() is QualifiedNameSyntax)
+                attributeType = attrib.ChildNodes().First().ChildNodes().FirstOrDefault().DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault();
+            else
+                attributeType = attrib.ChildNodes().First().DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+
+            if (attributeType == null)
+                return null;
+
+            var attributeInfo = context.SemanticModel.GetTypeInfo(attributeType);
+            if (attributeInfo.Type == null)
+                return null;
+
+            if (attributeInfo.Type.ToString() != typeof(ThrowsExceptionAttribute).ToString())
+                return null;
+
+            var typeOf = attrib.Attributes.First().ArgumentList.DescendantNodes().OfType<TypeOfExpressionSyntax>().FirstOrDefault();
+            if (typeOf == null)
+                return null;
+
+            IdentifierNameSyntax exceptionType = null;
+            var qualifiedName = typeOf.DescendantNodes().OfType<QualifiedNameSyntax>().FirstOrDefault();
+            if (qualifiedName == null)
+                exceptionType = typeOf.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+            else
+                exceptionType = qualifiedName.DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault();
+
+            if (exceptionType == null)
+                return null;
+
+            var info = context.SemanticModel.GetTypeInfo(exceptionType);
+            return info.Type;
+        }
+
+        public static CheckedException.Core.DiagnosticSeverity? GetAttributeParameterSeverity(SyntaxNodeAnalysisContext context, AttributeListSyntax attrib)
+        {
+            if (attrib.ChildNodes().Count() == 0)
+                return null;
+
+            IdentifierNameSyntax attributeType = null;
+            if (attrib.ChildNodes().First().ChildNodes().FirstOrDefault() is QualifiedNameSyntax)
+                attributeType = attrib.ChildNodes().First().ChildNodes().FirstOrDefault().DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault();
+            else
+                attributeType = attrib.ChildNodes().First().DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+
+            if (attributeType == null)
+                return null;
+
+            var attributeInfo = context.SemanticModel.GetTypeInfo(attributeType);
+            if (attributeInfo.Type == null)
+                return null;
+
+            if (attributeInfo.Type.ToString() != typeof(ThrowsExceptionAttribute).ToString())
+                return null;
+
+            var severity = attrib.Attributes.First().ArgumentList.DescendantNodes().OfType<MemberAccessExpressionSyntax>().FirstOrDefault();
+            if (severity == null)
+                return Core.DiagnosticSeverity.Error;
+
+            var typeInfo = context.SemanticModel.GetTypeInfo(severity.Expression);
+            if (typeInfo.Type == null || typeInfo.Type.ToString() != typeof(Core.DiagnosticSeverity).ToString())
+                return null;
+
+            Core.DiagnosticSeverity? result = null;
+            foreach (var sev in Enum.GetValues(typeof(Core.DiagnosticSeverity)))
+            {
+                if (((Core.DiagnosticSeverity)sev).ToString().Equals(severity.Name.Identifier.Text))
+                {
+                    result = (Core.DiagnosticSeverity)sev;
+                    break;
+                }
+            }
+
             return result;
         }
     }

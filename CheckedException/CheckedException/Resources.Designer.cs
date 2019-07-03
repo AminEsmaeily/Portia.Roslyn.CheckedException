@@ -62,38 +62,29 @@ namespace CheckedException {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This method might have thrown an exception, but it isn&apos;t handled in code. Please use either TryCatch to handle or rethrow it using ThrowsExceptionAttribute to announce your methods&apos; caller about this exception..
+        ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string AnalyzerDescription {
+        internal static string DuplicateAttributeAnalyzerDescription {
             get {
-                return ResourceManager.GetString("AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("DuplicateAttributeAnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The exception of type {0} is not handled in code..
+        ///   Looks up a localized string similar to Another attribute with the {0} exception type has been declared for this method. Please remove one of them..
         /// </summary>
-        internal static string AnalyzerMessageFormat {
+        internal static string DuplicateAttributeAnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DuplicateAttributeAnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The exception is not handled in code.
+        ///   Looks up a localized string similar to Another attribute with the same exception type has been declared..
         /// </summary>
-        internal static string AnalyzerTitle {
+        internal static string DuplicateAttributeAnalyzerTitle {
             get {
-                return ResourceManager.GetString("AnalyzerTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fix all using TryCatch.
-        /// </summary>
-        internal static string FixAllByTryCatch {
-            get {
-                return ResourceManager.GetString("FixAllByTryCatch", resourceCulture);
+                return ResourceManager.GetString("DuplicateAttributeAnalyzerTitle", resourceCulture);
             }
         }
         
@@ -112,6 +103,78 @@ namespace CheckedException {
         internal static string FixByTryCatch {
             get {
                 return ResourceManager.GetString("FixByTryCatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method might have thrown an exception, but it isn&apos;t handled in code. Please use either TryCatch to handle or rethrow it using ThrowsExceptionAttribute to announce your methods&apos; caller about this exception..
+        /// </summary>
+        internal static string NotHandledAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("NotHandledAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The exception of type {0} is not handled in code..
+        /// </summary>
+        internal static string NotHandledAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("NotHandledAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The exception is not handled in code.
+        /// </summary>
+        internal static string NotHandledAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("NotHandledAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The container class of this method has a ThrowException attribute of this exception type, then this declaration is redundant here..
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The exception of type {0} has been declared for the class. This declaration is redundant here..
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The declared attribute is redundant.
+        /// </summary>
+        internal static string RedundantAttributeAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RedundantAttributeAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove duplicate attribute.
+        /// </summary>
+        internal static string RemoveDuplicateAttribute {
+            get {
+                return ResourceManager.GetString("RemoveDuplicateAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove redundant attribute.
+        /// </summary>
+        internal static string RemoveRedundantAttribute {
+            get {
+                return ResourceManager.GetString("RemoveRedundantAttribute", resourceCulture);
             }
         }
     }

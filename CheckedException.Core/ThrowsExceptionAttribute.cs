@@ -5,10 +5,6 @@ namespace CheckedException.Core
     [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class, AllowMultiple = true)]
     public class ThrowsExceptionAttribute : Attribute
     {
-        public ThrowsExceptionAttribute()
-        {
-        }
-
         public ThrowsExceptionAttribute(Type exceptionType)
         {
             this.ExceptionType = exceptionType;
