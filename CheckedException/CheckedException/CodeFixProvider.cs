@@ -171,8 +171,9 @@ namespace CheckedException
 
             var calleeAttributes = NotHandledAnalyzer.GetAllAttributes(sm, completeMethod);
             var catchedAttributes = await GetCallerAttributesAsync(context, cancellationToken);
+            var tryElement = invocation.Parent.FirstAncestorOrSelf<TryStatementSyntax>();
 
-            var newAttributes = new SyntaxList<AttributeListSyntax>();
+            var newAttributes = callerMethodContainer.AttributeLists;
             foreach(var attrib in calleeAttributes)
             {
                 var skip = false;
@@ -205,11 +206,35 @@ namespace CheckedException
                     }
                 }
 
+                if (!skip && tryElement != null)
+                {
+                    foreach (var f in tryElement.Catches)
+                    {
+                        if (f.Declaration != null)
+                            foreach (var k in f.Declaration.DescendantNodes().OfType<IdentifierNameSyntax>())
+                            {
+                                var typeInfo = sm.GetTypeInfo(k);
+                                if (typeInfo.Type == null)
+                                    continue;
+
+                                if (typeInfo.Type.ToString().Equals(typeof(Exception).FullName) ||
+                                    typeInfo.Type.ToString().Equals(exceptionName))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                        if (skip)
+                            break;
+                    }
+                }
+
                 if (skip)
                     continue;
 
                 var attributeName = typeof(ThrowsExceptionAttribute).FullName.Substring(0, typeof(ThrowsExceptionAttribute).FullName.IndexOf("Attribute"));
-                newAttributes = newAttributes.AddRange(callerMethodContainer.AttributeLists.Add(
+                newAttributes = newAttributes.Add(
                     SyntaxFactory.AttributeList(
                         SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
                         SyntaxFactory.Attribute(
@@ -218,7 +243,7 @@ namespace CheckedException
                                 SyntaxFactory.SingletonSeparatedList<AttributeArgumentSyntax>(
                                 SyntaxFactory.AttributeArgument(
                                     SyntaxFactory.TypeOfExpression(
-                                    SyntaxFactory.IdentifierName(exceptionName))))))))));
+                                    SyntaxFactory.IdentifierName(exceptionName)))))))));
             }
 
             try

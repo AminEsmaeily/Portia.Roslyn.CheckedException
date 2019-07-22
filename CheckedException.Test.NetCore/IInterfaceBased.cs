@@ -9,6 +9,7 @@ namespace CheckedException.Test.NetCore
         void MethodWithoutReturnValue();
 
         [ThrowsException(typeof(System.ArgumentOutOfRangeException))]
+        [ThrowsException(typeof(NullReferenceException))]
         int MethodWithReturnValue();
     }
 }
