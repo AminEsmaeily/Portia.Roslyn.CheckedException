@@ -1,12 +1,13 @@
 ﻿using CheckedException.Core;
 using System;
+using System.ComponentModel;
 
 namespace CheckedException.Test.NetCore
 {
     [ThrowsException(typeof(InvalidOperationException))]
     public class MainTest
     {
-        [CheckedException.Core.ThrowsException(typeof(System.IO.FileNotFoundException))]
+        [Description]
         public void MainMethod()
         {
             //// Local class
@@ -16,8 +17,15 @@ namespace CheckedException.Test.NetCore
 
             var value1 = MethodWithReturnValue(); // Local Declaration Statement
 
-            if (MethodWithReturnValue() == 10) // If Statement
+            try
             {
+                if (MethodWithReturnValue() == 10) // If Statement
+                {
+                }
+            }
+            catch (ArgumentException)
+            {
+
             }
 
             while(MethodWithReturnValue() == 5) // While Statement
@@ -37,7 +45,13 @@ namespace CheckedException.Test.NetCore
 
             interfaceBased.MethodWithoutReturnValue();
 
-            interfaceBased.MethodWithReturnValue();
+            try
+            {
+                interfaceBased.MethodWithReturnValue();
+            }
+            catch (System.ArgumentOutOfRangeException)
+            {
+            }            
             //////////////////////
 
             // Abstract based
@@ -57,6 +71,7 @@ namespace CheckedException.Test.NetCore
         }
 
         [ThrowsException(typeof(ArgumentException), CheckedException.Core.DiagnosticSeverity.Warning)]
+        [ThrowsException(typeof(NullReferenceException))]
         private int MethodWithReturnValue()
         {
             return 10;
