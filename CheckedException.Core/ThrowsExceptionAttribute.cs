@@ -2,7 +2,7 @@
 
 namespace CheckedException.Core
 {
-    [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method|AttributeTargets.Class|AttributeTargets.Interface, AllowMultiple = true)]
     public class ThrowsExceptionAttribute : Attribute
     {
         public ThrowsExceptionAttribute(Type exceptionType)

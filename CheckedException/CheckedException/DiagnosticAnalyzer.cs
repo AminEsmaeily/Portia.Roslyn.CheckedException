@@ -230,8 +230,20 @@ namespace CheckedException
         private static void MethodDeclarationAnalyzer(SyntaxNodeAnalysisContext context)
         {
             var method = (MethodDeclarationSyntax)context.Node;
+            if (method == null)
+                return;
+
             var methodAttributes = method.AttributeLists;
-            var classAttributes = method.FirstAncestorOrSelf<ClassDeclarationSyntax>().AttributeLists;
+            if (methodAttributes == null)
+                return;
+
+            var classDeclaration = method.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+            if (classDeclaration == null)
+                return;
+
+            var classAttributes = classDeclaration.AttributeLists;
+            if (classAttributes == null)
+                return;
 
             var repeatedAttributes = from classAttributeList in classAttributes
                                      from methodAttributeList in methodAttributes
