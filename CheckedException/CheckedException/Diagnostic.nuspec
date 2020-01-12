@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Portia.Roslyn.CheckedException</id>
-    <version>1.2.7142</version>
+    <version>1.3.7198</version>
     <title>Checked Exception</title>
     <authors>Amin Esmaeily</authors>
     <owners>Amin Esmaeily</owners>
@@ -12,7 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This library is an analyzer and code fix provider based on Roslyn that allows developers to inform others of the exceptions which their methods can throw.</description>
     <releaseNotes>
-      • Fix some bugs
+      • Fix NullReferenceException in RedundantAnalyzer
+      • Make able the ThrowsExceptionAttribute to declare on the interfaces
     </releaseNotes>
     <copyright>Copyright @2019</copyright>
     <tags>CheckedException, analyzers, Exception, ExceptionHandling</tags>
